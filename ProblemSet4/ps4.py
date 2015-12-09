@@ -21,9 +21,45 @@ def simulationDelayedTreatment(numTrials):
 
     numTrials: number of simulation runs to execute (an integer)
     """
-    
-    # TODO
 
+    timeBeforeTreatment=0
+    numViruses = 100
+    maxPop = 1000
+    maxBirthProb = 0.1
+    resistances={'guttagonol': False}
+    clearProb = 0.05
+    mutProb=0.005
+    numTrials = numTrials
+    totalPopResults = []
+
+
+
+    for trial in range(0,numTrials):
+        viruses = []
+        for i in range(numViruses):
+            viruses.append(ResistantVirus(maxBirthProb,clearProb, resistances, mutProb))
+        patient = TreatedPatient(viruses, maxPop)
+
+        for step in range(0, timeBeforeTreatment):
+            patient.update()
+
+
+        patient.addPrescription("guttagonol")
+
+        for step in range(timeBeforeTreatment, timeBeforeTreatment + 150):
+            patient.update()
+
+        totalPopResults.append(patient.getTotalPop())
+
+
+
+    pylab.hist(totalPopResults, bins=20)
+    pylab.xlabel("Virus Population")
+    pylab.ylabel("# Trials w/ Result")
+    pylab.title("Delayed Treatment Simulation")
+    pylab.legend()
+
+    pylab.show()
 
 
 
@@ -45,4 +81,51 @@ def simulationTwoDrugsDelayedTreatment(numTrials):
 
     numTrials: number of simulation runs to execute (an integer)
     """
-    # TODO
+
+    timeBeforeTreatment=150
+    timeBetweenTreatments=75
+    numViruses = 100
+    maxPop = 1000
+    maxBirthProb = 0.1
+    resistances={'guttagonol': False, 'grimpex': False}
+    clearProb = 0.05
+    mutProb=0.005
+    numTrials = numTrials
+    totalPopResults = []
+
+
+
+    for trial in range(0,numTrials):
+        viruses = []
+        for i in range(numViruses):
+            viruses.append(ResistantVirus(maxBirthProb,clearProb, resistances, mutProb))
+        patient = TreatedPatient(viruses, maxPop)
+
+        for step in range(0, timeBeforeTreatment):
+            patient.update()
+
+
+        patient.addPrescription("guttagonol")
+
+        for step in range(timeBeforeTreatment, timeBeforeTreatment + timeBetweenTreatments):
+            patient.update()
+
+        patient.addPrescription('grimpex')
+
+        for step in range(timeBeforeTreatment + timeBetweenTreatments, timeBeforeTreatment + timeBetweenTreatments + 150):
+            patient.update()
+
+        totalPopResults.append(patient.getTotalPop())
+
+
+
+    pylab.hist(totalPopResults, bins=20)
+    pylab.xlabel("Virus Population")
+    pylab.ylabel("# Trials w/ Result")
+    pylab.title("Two Drugs Delayed Treatment Simulation")
+    pylab.legend()
+
+    pylab.show()
+
+
+simulationTwoDrugsDelayedTreatment(100)

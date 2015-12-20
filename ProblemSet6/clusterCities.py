@@ -1,5 +1,5 @@
 #Code shared across examples
-import pylab, string
+import pylab, string, math
 
 def stdDev(X):
     mean = sum(X)/float(len(X))
@@ -47,30 +47,56 @@ class Cluster(object):
         and the pointType is also saved """
         self.points = points
         self.pointType = pointType
+
     def singleLinkageDist(self, other):
         """ Returns the float distance between the points that 
         are closest to each other, where one point is from 
         self and the other point is from other. Uses the 
         Euclidean dist between 2 points, defined in Point."""
         # TO DO
-        pass
+
+        distances=[]
+
+        for selfPoint in self.points:
+            for otherPoint in other.points:
+                distances.append(selfPoint.distance(otherPoint))
+        return min(distances)
+
+
     def maxLinkageDist(self, other):
         """ Returns the float distance between the points that 
         are farthest from each other, where one point is from 
         self and the other point is from other. Uses the 
         Euclidean dist between 2 points, defined in Point."""
         # TO DO
-        pass
+
+        distances=[]
+
+        for selfPoint in self.points:
+            for otherPoint in other.points:
+                distances.append(selfPoint.distance(otherPoint))
+        return max(distances)
+
+
     def averageLinkageDist(self, other):
         """ Returns the float average (mean) distance between all 
         pairs of points, where one point is from self and the 
         other point is from other. Uses the Euclidean dist 
         between 2 points, defined in Point."""
         # TO DO
-        pass
+        distances=[]
+
+        for selfPoint in self.points:
+            for otherPoint in other.points:
+                distances.append(selfPoint.distance(otherPoint))
+        return sum(distances)/len(distances)
+
+
+
     def members(self):
         for p in self.points:
             yield p
+
     def isIn(self, name):
         """ Returns True is the element named name is in the cluster
         and False otherwise """
@@ -102,6 +128,7 @@ class ClusterSet(object):
     def __init__(self, pointType):
         """ Initialize an empty set, without any clusters """
         self.members = []
+
     def add(self, c):
         """ Append a cluster to the end of the cluster list
         only if it doesn't already exist. If it is already in the 
@@ -109,26 +136,48 @@ class ClusterSet(object):
         if c in self.members:
             raise ValueError
         self.members.append(c)
+
     def getClusters(self):
         return self.members[:]
+
     def mergeClusters(self, c1, c2):
         """ Assumes clusters c1 and c2 are in self
         Adds to self a cluster containing the union of c1 and c2
         and removes c1 and c2 from self """
         # TO DO
-        pass
+
+        newCluster = Cluster(c1.points+c2.points,c1.pointType)
+        self.members.append(newCluster)
+        self.members.remove(c1)
+        self.members.remove(c2)
+
+
+
     def findClosest(self, linkage):
         """ Returns a tuple containing the two most similar 
         clusters in self
         Closest defined using the metric linkage """
         # TO DO
-        pass
+        results = ()
+        for firstCluster in self.members:
+            for secondCluster in self.members:
+                if results == () and firstCluster != secondCluster:
+                    results = (firstCluster, secondCluster)
+                elif firstCluster != secondCluster and linkage(firstCluster, secondCluster) < linkage(results[0],results[1]):
+                    results = (firstCluster, secondCluster)
+        return results
+
     def mergeOne(self, linkage):
         """ Merges the two most simililar clusters in self
         Similar defined using the metric linkage
         Returns the clusters that were merged """
-        # TO DO
-        pass
+
+        first, second = self.findClosest(linkage)
+        return (first,second)
+
+
+
+
     def numClusters(self):
         return len(self.members)
     def toStr(self):
@@ -221,11 +270,11 @@ def hCluster(points, linkage, numClusters, printHistory):
 def test():
     points = buildCityPoints('cityTemps.txt', False)
     hCluster(points, Cluster.singleLinkageDist, 10, False)
-    #points = buildCityPoints('cityTemps.txt', True)
-    #hCluster(points, Cluster.maxLinkageDist, 10, False)
-    #hCluster(points, Cluster.averageLinkageDist, 10, False)
-    #hCluster(points, Cluster.singleLinkageDist, 10, False)
+    points = buildCityPoints('cityTemps.txt', True)
+    hCluster(points, Cluster.maxLinkageDist, 10, False)
+    hCluster(points, Cluster.averageLinkageDist, 10, False)
+    hCluster(points, Cluster.singleLinkageDist, 10, False)
 
-#test()
+test()
 
 
